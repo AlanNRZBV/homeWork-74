@@ -1,11 +1,24 @@
 import { Router } from 'express';
-import { MessageWithoutId } from '../types';
+import { IMessage } from '../types';
 import { fileDB } from '../fileDB';
 
-export const messagesRouter = Router()
+export const messagesRouter = Router();
 
-messagesRouter.get('/', (req, res)=>{
-  res.send('get response here')
+messagesRouter.get('/', async (req, res)=>{
+    const dbResponse = await fileDB.readMessages()
+  if(dbResponse !== undefined){
+
+    if(dbResponse.length > 5){
+      const reducedResponse = dbResponse.slice(-5)
+    res.send(reducedResponse)
+    }else{
+      res.send(dbResponse)
+    }
+  }else{
+    res.send('undefined')
+  }
+
+
 })
 
 messagesRouter.post('/', async (req, res)=>{
@@ -13,7 +26,7 @@ messagesRouter.post('/', async (req, res)=>{
   const now = new Date()
   const createdAt = now.toISOString()
 
- const message: MessageWithoutId = {
+ const message: IMessage = {
    message: req.body.message,
    date: createdAt
   }
